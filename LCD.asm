@@ -1,6 +1,7 @@
 #include p18f87k22.inc
 
-    global  LCD_Setup, LCD_Write_Message
+    global  LCD_Setup, LCD_Write_Message, LCD_Output, counter
+    extern  UART_Setup, UART_Transmit_Message
 
 acs0    udata_acs   ; named variables in access ram
 LCD_cnt_l   res 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -8,12 +9,22 @@ LCD_cnt_h   res 1   ; reserve 1 byte for variable LCD_cnt_h
 LCD_cnt_ms  res 1   ; reserve 1 byte for ms counter
 LCD_tmp	    res 1   ; reserve 1 byte for temporary use
 LCD_counter res 1   ; reserve 1 byte for counting through nessage
-
+counter	    res 1   ; reserve one byte for a counter variable
+ 
+tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
+myArray res 0x80    ; reserve 128 bytes for message data
+ 
 	constant    LCD_E=5	; LCD enable bit
     	constant    LCD_RS=4	; LCD register select bit
-
+	
+	
+pdata	code
+myTable data	    "Game Over :( \n"	; message, plus carriage return
+	constant    myTable_l=.14	; length of data
+	
+	
 LCD	code
-    
+	
 LCD_Setup
 	clrf    LATB
 	movlw   b'11000000'	    ; RB0:5 all outputs
@@ -131,7 +142,34 @@ lcdlp1	decf 	LCD_cnt_l,F	; no carry when 0x00 -> 0xff
 	subwfb 	LCD_cnt_h,F	; no carry when 0x00 -> 0xff
 	bc 	lcdlp1		; carry, then loop again
 	return			; carry reset so return
+	
 
+LCD_Output
+	call	LCD_Setup
+	call	UART_Setup
+	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
+	movlw	upper(myTable)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(myTable)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(myTable)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	myTable_l	; bytes to read
+	movwf 	counter		; our counter register
+loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	counter		; count down to zero
+	bra	loop		; keep going until finished
+	
+	movlw	myTable_l-1	; output message to LCD (leave out "\n")
+	lfsr	FSR2, myArray
+	call	LCD_Write_Message
+	
+	movlw	myTable_l	; output message to UART
+	lfsr	FSR2, myArray
+	call	UART_Transmit_Message
+
+	return
 
     end
 

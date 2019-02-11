@@ -1,9 +1,9 @@
 #include p18f87k22.inc
 
-    global  keyboard_columns, OUTPUT_D, register_test
+    global  keyboard_columns, keyboard_output, user_input
 
 acs0	udata_acs
-register_test	res 1
+user_input 	res 1
 
 keyboard    code
 
@@ -13,14 +13,14 @@ keyboard_columns
     clrf    LATE
     movlw   0x0f
     movwf   TRISE
-    
+    return
 	
-OUTPUT_D
-	movlw	0x00
-	movwf	TRISD
-	movff	PORTE, register_test ; goto current line in code
-	;movff	register_test, PORTD
-	return
+keyboard_output
+    movlw	0x00
+    movwf	TRISD
+    movff	PORTE, user_input ; goto current line in code
+    movff	user_input, PORTD
+    return
     
     end
 
