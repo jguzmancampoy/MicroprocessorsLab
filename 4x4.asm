@@ -19,7 +19,7 @@ OUTPUT_D
 	movlw	0x00
 	movwf	TRISD
 	movff	PORTE, register_test ; goto current line in code
-	movff	register_test, PORTD
+	;movff	register_test, PORTD
 	return
     
     end
