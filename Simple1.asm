@@ -2,6 +2,7 @@
 
 	extern  keyboard_columns, keyboard_output, user_input ; external keyboard subroutines
 	extern	LCD_Setup, LCD_Write_Message, LCD_Output, counter
+	extern	DAC_Setup
 	
 acs0	udata_acs   ; reserve data space in access ram
 delay_count	res 1   ; reserve one byte for counter in the delay routine
@@ -45,4 +46,19 @@ start
 	movwf	checker_count
 	call	check
 
+DAC_plotting
+	extern	DAC_Setup
+	
+rst	code	0x0000	; reset vector
+	goto	start
+
+main	code
+	movlw	0x00
+	movwf	0x44
+start	
+	incf	0x44
+	call	DAC_Setup
+	decfsz	delay
+	goto	start		; Sit in infinite loop
+	
 	end
