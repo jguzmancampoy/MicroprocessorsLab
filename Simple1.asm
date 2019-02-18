@@ -2,7 +2,7 @@
 
 	extern  keyboard_columns, keyboard_output, user_input ; external keyboard subroutines
 	extern	LCD_Setup, LCD_Write_Message, LCD_Output, counter
-	extern	DAC_Setup
+	extern	DAC_Setup, DAC_plot, variable1, variable2, voltage
 	
 acs0	udata_acs   ; reserve data space in access ram
 delay_count	res 1   ; reserve one byte for counter in the delay routine
@@ -40,25 +40,19 @@ delay
     return
 
 start
-	movlw	0x0e		;This checks which frets NEED to be pressed
+	movlw	0x00
+	movwf	voltage
+	
+	movlw	0xff
+	movwf	variable1
+	movwf	variable2
+	
+	call	DAC_plot
+	
+	movlw	0x00		;This checks which frets NEED to be pressed
 	movwf	fret_value	;This stores them in memory location
+	
 	movlw	0x04		;This checks how long the fret needs to be pressed
 	movwf	checker_count
 	call	check
-
-DAC_plotting
-	extern	DAC_Setup
-	
-rst	code	0x0000	; reset vector
-	goto	start
-
-main	code
-	movlw	0x00
-	movwf	0x44
-start	
-	incf	0x44
-	call	DAC_Setup
-	decfsz	delay
-	goto	start		; Sit in infinite loop
-	
 	end
