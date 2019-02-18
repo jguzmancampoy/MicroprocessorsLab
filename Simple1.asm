@@ -47,7 +47,10 @@ start
 	movwf	variable1
 	movwf	variable2
 	
+	call	DAC_Setup
+DAC_loop
 	call	DAC_plot
+	bra	DAC_loop
 	
 	movlw	0x00		;This checks which frets NEED to be pressed
 	movwf	fret_value	;This stores them in memory location

@@ -21,21 +21,22 @@ DAC	code
 DAC_Setup
 	clrf	TRISJ		; Set PORTD as all outputs
 	clrf	LATJ		; Clear PORTD outputs
-	movlw	b'10000111'	; Set timer0 to 16-bit, Fosc/4/256
-	movwf	T0CON		; = 62.5KHz clock rate, approx 1sec rollover
-	movff	voltage, PORTJ
-	bsf	INTCON,TMR0IE	; Enable timer0 interrupt
-	bsf	INTCON,GIE	; Enable all interrupts
+;	movlw	b'10000111'	; Set timer0 to 16-bit, Fosc/4/256
+;	movwf	T0CON		; = 62.5KHz clock rate, approx 1sec rollover
+	
+;	bsf	INTCON,TMR0IE	; Enable timer0 interrupt
+;	bsf	INTCON,GIE	; Enable all interrupts
 	return
 
 DAC_plot
-	call	DAC_Setup
-	decfsz  variable1
-	goto	DAC_plot
+;DAC_plot_delay	
+;	decfsz  variable1
+;	goto	DAC_plot_delay
 	incf	voltage
-	goto	DAC_plot
-	;decfsz  variable2
-	return
+	movff	voltage, PORTJ
+	
+;	decfsz  variable2
+;	goto	DAC_plot	return
 	
 	end
 
