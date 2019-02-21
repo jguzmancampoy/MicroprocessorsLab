@@ -19,7 +19,7 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	bsf	EECON1, EEPGD 	; access Flash program memory
 	call	keyboard_columns ; setup for column orientation
 
-    goto    start
+	goto    start
 
 ;------ CHECKER FUNCTION ---------------------------------------------------
 check	
@@ -48,8 +48,27 @@ start
 	movwf	variable2
 	
 	call	DAC_Setup
+
+keyboard_test
+	call	keyboard_output
+	bra	keyboard_test
 DAC_loop
+	movlw   0x00
+	movwf	voltage
 	call	DAC_plot
+	
+	movlw	0x0e
+	movwf	voltage
+	call	DAC_plot
+	
+	movlw	0x42 
+	movwf	voltage
+	call	DAC_plot
+	
+	movlw	0xb54
+	movwf	voltage
+	call	DAC_plot
+	
 	bra	DAC_loop
 	
 	movlw	0x00		;This checks which frets NEED to be pressed

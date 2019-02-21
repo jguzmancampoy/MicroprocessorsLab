@@ -7,7 +7,10 @@ acs0		udata_acs	    ; reserve data space in access ram
 variable1	res	1   ;reserve space for delay
 variable2	res	1   ;reserve space for delay
 voltage		res	1   ; reserve byte for voltage		
-	
+
+DCounter1	equ	0X0C
+DCounter2	equ	0X0D
+DCounter3	equ	0X0E
 	
 	
 int_hi	code	0x0008		; high vector, no low vector
@@ -27,17 +30,30 @@ DAC_Setup
 ;	bsf	INTCON,TMR0IE	; Enable timer0 interrupt
 ;	bsf	INTCON,GIE	; Enable all interrupts
 	return
-
+DELAY
+	movlw	0xbd
+    	movwf	DCounter1
+	movlw	0x4b
+	movwf	DCounter2
+	movlw	0x15
+	movwf	DCounter3
+    
+LOOP
+	decfsz	DCounter1, 1
+	goto	LOOP
+	decfsz	DCounter2, 1
+	goto	LOOP
+	decfsz	DCounter3, 1
+	goto	LOOP
+	return
+	
 DAC_plot
-;DAC_plot_delay	
-;	decfsz  variable1
-;	goto	DAC_plot_delay
-	incf	voltage
 	movff	voltage, PORTJ
-	
-;	decfsz  variable2
-;	goto	DAC_plot	return
-	
+	call	DELAY
+	return
+;DAC_plot_user
+	;movff 
+
 	end
 
 
