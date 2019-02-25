@@ -1,11 +1,9 @@
 #include p18f87k22.inc
 	
-	global	DAC_Setup, DAC_plot, variable1, variable2, voltage
+	global	DAC_Setup, DAC_plot, voltage
 	
 	
 acs0		udata_acs	    ; reserve data space in access ram
-variable1	res	1   ;reserve space for delay
-variable2	res	1   ;reserve space for delay
 voltage		res	1   ; reserve byte for voltage		
 
 DCounter1	equ	0X0C
