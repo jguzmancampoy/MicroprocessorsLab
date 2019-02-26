@@ -1,9 +1,10 @@
 #include p18f87k22.inc
 
 	extern  keyboard_columns, keyboard_output, user_input ; external keyboard subroutines
-	extern	LCD_Setup, LCD_Write_Message, LCD_Output, counter
+	extern	LCD_Setup, LCD_Write_Message, LCD_Output_GO, counter, LCD_Clear, LCD_Output_L1
 	extern	DAC_Setup, DAC_plot, voltage
-	extern	fret_values, voltages	
+	extern	fret_values, voltages
+	extern  fret1,fret2,fret3,fret4,fret_zero
 	
 	
 acs0	udata_acs		; reserve data space in access ram
@@ -14,9 +15,13 @@ fret_value	    res	    1	; reserve one byte for fret value
 DCounter1	    res	    1	; ""
 DCounter2	    res	    1	; ""
 DCounter3	    res	    1	; ""
-	    
-	    
-	    
+AA		    res	    1
+BB		    res	    1
+CC		    res	    1
+d1		    res	    1
+d2		    res	    1
+d3		    res	    1	    
+
 
 rst	code	0    ; reset vector
 	goto	setup
@@ -28,57 +33,58 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	call	keyboard_columns ; setup for column orientation
 	call	fret_values
 	call	voltages
-
+	call	LCD_Setup
 	goto    start
 
 ;------ CHECKER FUNCTION ---------------------------------------------------
-check	
+checking	
 	call	keyboard_output	;puts the value of PORTE into user_input
 	movf	user_input, W
 	xorwf	fret_value , 0  ; XOR with fret_value and user input, zero if the same
 	movwf	logic_destination   ; stores in the bit logic destination
 	tstfsz	logic_destination ; branches out of loop if false
-	call	LCD_Output
+	call	LCD_Output_GO
 	return
 	
-;------------delay function------------------------------------------------	
-delay_1s
-	movlw	0xbd
+;------------delay function------------------------------------------------		
+check
+	movlw	0x11
     	movwf	DCounter1
-	movlw	0x4b
+	movlw	0x5D
 	movwf	DCounter2
-	movlw	0x15
-	movwf	DCounter3
-delay_loop
-	call	keyboard_output	    ;calls the keyboard plotter in the delay
-	decfsz	DCounter1, 1	    
-	goto	delay_loop
-	decfsz	DCounter2, 1
-	goto	delay_loop
-	decfsz	DCounter3, 1
-	goto	delay_loop
-	return
-	
-delay_check
-	movlw	0xbd
-    	movwf	DCounter1
-	movlw	0x4b
-	movwf	DCounter2
-	movlw	0x15
+	movlw	0x05
 	movwf	DCounter3
 	
-delay_check_loop
-	call	check
+check_loop
+	call	checking
 	call	keyboard_output	    ;calls the keyboard plotter in the delay
-	decfsz	DCounter1, 1	    
-	goto	delay_loop
-	decfsz	DCounter2, 1
-	goto	delay_loop
-	decfsz	DCounter3, 1
-	goto	delay_loop
+	decfsz	DCounter1, f	    
+	goto	check_loop
+	decfsz	DCounter2, f
+	goto	check_loop
+	decfsz	DCounter3, f
+	goto	check_loop
 	return
-		
+
+
+delay	
+	movlw	0x11
+	movwf	d1
+	movlw	0x5D
+	movwf	d2
+	movlw	0x05
+	movwf	d3
 	
+Delay_loop
+	call	keyboard_output	    ;calls the keyboard plotter in the delay
+	decfsz	d1, f
+	goto	Delay_loop
+	decfsz	d2, f
+	goto	Delay_loop
+	decfsz	d3, f
+	goto	Delay_loop
+	return	
+
 level0
 	movlw	0xff ;
 	movwf   voltage
@@ -102,33 +108,125 @@ level4
 	
 start	
 	call	DAC_Setup
-	call	game_loop
+	call	song1
+	call	fret_values
+
 	
-game_loop
-	movlw	0x00		;This checks which frets NEED to be pressed
-	movwf	fret_value	;This stores them in memory location
+song1
+	call	delay  
+	call	delay
+	call	delay
+	call	delay
+	call	delay  
+	call	delay  
+	call	delay
+	call	delay
 	
+	
+	call	LCD_Output_L1
 	call	level0
 	call	DAC_plot
-	call	delay_1s
+	call	delay
+	call	delay
 	
 	call	level1
 	call	DAC_plot
-	call	delay_1s
-	call	delay_check
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
 	
 	call	level2
 	call	DAC_plot
-	call	delay_1s
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
 	
 	call	level3
 	call	DAC_plot
-	call	delay_1s
+	call	delay
+	call	delay
+	movff	fret3, fret_value
+	call	check
 	
 	call	level4
 	call	DAC_plot
-	call	delay_1s
-	bra	game_loop
+	call	delay
+	call	delay
+	movff	fret4, fret_value
+	call	check
+
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level2
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
+	
+	call	level3
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret3, fret_value
+	call	check
+	
+	call	level4
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret4, fret_value
+	call	check
+	
+
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level2
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
+	
+	call	level3
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret3, fret_value
+	call	check
+	
+	call	level4
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret4, fret_value
+	call	check
 	
 	end
 	

@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-    global  LCD_Setup, LCD_Write_Message, LCD_Output, counter
+    global  LCD_Setup, LCD_Write_Message, LCD_Output_GO, counter, LCD_Clear, LCD_Output_L1
     extern  UART_Setup, UART_Transmit_Message
 
 acs0    udata_acs   ; named variables in access ram
@@ -22,7 +22,13 @@ pdata	code
 myTable data	    "Game Over :( \n"	; message, plus carriage return
 	constant    myTable_l=.14	; length of data
 	
-	
+myTable1 data	    "Level 1 \n"
+	 constant   myTable_2=.9   
+
+myTable2 data	    "Level 2 \n"
+	 constant   myTable_3=.9
+
+ 
 LCD	code
 	
 LCD_Setup
@@ -56,9 +62,10 @@ LCD_Setup
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
 	return
-
+	
 LCD_Write_Message	    ; Message stored at FSR2, length stored in W
 	movwf   LCD_counter
+	
 LCD_Loop_message
 	movf    POSTINC2, W
 	call    LCD_Send_Byte_D
@@ -124,7 +131,7 @@ lcdlp2	movlw	.250	    ; 1 ms delay
 	decfsz	LCD_cnt_ms
 	bra	lcdlp2
 	return
-    
+	
 LCD_delay_x4us		    ; delay given in chunks of 4 microsecond in W
 	movwf	LCD_cnt_l   ; now need to multiply by 16
 	swapf   LCD_cnt_l,F ; swap nibbles
@@ -143,8 +150,41 @@ lcdlp1	decf 	LCD_cnt_l,F	; no carry when 0x00 -> 0xff
 	bc 	lcdlp1		; carry, then loop again
 	return			; carry reset so return
 	
+LCD_Clear
+	movlw	b'00000001'	; display clear
+	call	LCD_Send_Byte_I
+	movlw	.3
+	call	LCD_delay_ms
+	return
 
-LCD_Output
+LCD_Output_L1
+	call	LCD_Setup
+	call	UART_Setup
+	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
+	movlw	upper(myTable1)	; address of data in PM
+	movwf	TBLPTRU		; load upper bits to TBLPTRU
+	movlw	high(myTable1)	; address of data in PM
+	movwf	TBLPTRH		; load high byte to TBLPTRH
+	movlw	low(myTable1)	; address of data in PM
+	movwf	TBLPTRL		; load low byte to TBLPTRL
+	movlw	myTable_2	; bytes to read
+	movwf 	counter		; our counter register
+loop_L1 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	decfsz	counter		; count down to zero
+	bra	loop_L1		; keep going until finished
+	
+	movlw	myTable_2-1	; output message to LCD (leave out "\n")
+	lfsr	FSR2, myArray
+	call	LCD_Write_Message
+	
+	movlw	myTable_2	; output message to UART
+	lfsr	FSR2, myArray
+	call	UART_Transmit_Message
+	return
+	
+	
+LCD_Output_GO
 	call	LCD_Setup
 	call	UART_Setup
 	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
@@ -156,10 +196,10 @@ LCD_Output
 	movwf	TBLPTRL		; load low byte to TBLPTRL
 	movlw	myTable_l	; bytes to read
 	movwf 	counter		; our counter register
-loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+loop_GO tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
 	decfsz	counter		; count down to zero
-	bra	loop		; keep going until finished
+	bra	loop_GO		; keep going until finished
 	
 	movlw	myTable_l-1	; output message to LCD (leave out "\n")
 	lfsr	FSR2, myArray
@@ -168,7 +208,11 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	movlw	myTable_l	; output message to UART
 	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
-
+	movlw	0xff
+	movwf	PORTJ
+	movlw	0xff
+	movwf	PORTD
+	goto	$
 	return
 
     end

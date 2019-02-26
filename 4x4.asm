@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-    global  keyboard_columns, keyboard_output, user_input, fret_values, voltages
+    global  keyboard_columns, keyboard_output, user_input, fret_values, voltages,fret1,fret2,fret3,fret4,fret_zero
 
 acs0		udata_acs
 user_input 	res	1
@@ -40,6 +40,7 @@ fret_values
 	movwf	    fret4
 	movlw	    0x0f
 	movwf	    fret_zero
+
 voltages
 	movlw	    0xDC    
 	movwf	    voltage1
