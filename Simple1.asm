@@ -121,6 +121,10 @@ song1
 	call	delay  
 	call	delay
 	call	delay
+	call	delay  
+	call	delay
+	call	delay
+	call	delay
 	
 	
 	call	LCD_Output_L1
