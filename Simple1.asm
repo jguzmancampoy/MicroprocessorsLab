@@ -1,7 +1,7 @@
 #include p18f87k22.inc
 
 	extern  keyboard_columns, keyboard_output, user_input ; external keyboard subroutines
-	extern	LCD_Setup, LCD_Write_Message, LCD_Output_GO, counter, LCD_Clear, LCD_Output_L1
+	extern	LCD_Setup, LCD_Write_Message, LCD_Output_GO, counter, LCD_Clear, LCD_Output_L1,LCD_Output_L2
 	extern	DAC_Setup, DAC_plot, voltage
 	extern	fret_values, voltages
 	extern  fret1,fret2,fret3,fret4,fret_zero
@@ -161,6 +161,56 @@ song1
 	movff	fret4, fret_value
 	call	check
 
+	call	level3
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret3, fret_value
+	call	check
+	
+	call	level2
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level4
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret4, fret_value
+	call	check
+	
+	call	LCD_Output_L2
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
 	call	level0
 	call	DAC_plot
 	call	delay
@@ -182,11 +232,52 @@ song1
 	movff	fret2, fret_value
 	call	check
 	
-	call	level3
+	call	level0
 	call	DAC_plot
 	call	delay
 	call	delay
-	movff	fret3, fret_value
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
+	
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
 	call	check
 	
 	call	level4
@@ -196,41 +287,33 @@ song1
 	movff	fret4, fret_value
 	call	check
 	
+	call	level3
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret3, fret_value
+	call	check
+	
+	call	level2
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret2, fret_value
+	call	check
+	
+	call	level1
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret1, fret_value
+	call	check
+	
+	call	level0
+	call	DAC_plot
+	call	delay
+	call	delay
+	movff	fret_zero, fret_value
+	call	check
 
-	call	level0
-	call	DAC_plot
-	call	delay
-	call	delay
-	movff	fret_zero, fret_value
-	call	check
-	
-	call	level1
-	call	DAC_plot
-	call	delay
-	call	delay
-	movff	fret1, fret_value
-	call	check
-	
-	call	level2
-	call	DAC_plot
-	call	delay
-	call	delay
-	movff	fret2, fret_value
-	call	check
-	
-	call	level3
-	call	DAC_plot
-	call	delay
-	call	delay
-	movff	fret3, fret_value
-	call	check
-	
-	call	level4
-	call	DAC_plot
-	call	delay
-	call	delay
-	movff	fret4, fret_value
-	call	check
-	
 	end
 	
