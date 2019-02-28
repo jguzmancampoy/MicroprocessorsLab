@@ -127,18 +127,18 @@ song1
 	call	delay
 	
 	
-	call	LCD_Output_L1
-	call	level0
-	call	DAC_plot
-	call	delay
+	call	LCD_Output_L1	; plots "level 1" on LCD
+	call	level0		; sets the no fret voltage
+	call	DAC_plot	; plots no fret voltage (voltage =0)
+	call	delay		; 0.5 s delay
 	call	delay
 	
-	call	level1
+	call	level1		
 	call	DAC_plot
 	call	delay
 	call	delay
-	movff	fret1, fret_value
-	call	check
+	movff	fret1, fret_value   ; defines that fret1 needs to be pressed by moving it into ther variable used in the check SR
+	call	check		    ; checks whether correct fret is being pressed for 0.5 s
 	
 	call	level2
 	call	DAC_plot
