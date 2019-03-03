@@ -1,4 +1,2 @@
 # Microprocessors
-Repository for Physics Year 3 microprocessors lab
-
-A simple assembly program for PIC18 microprocessor, that counts to 100, putting the current count value out onto PORTB
+Please refer to the LCD_Hello_World branch for the project/game code.
